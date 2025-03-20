@@ -4,9 +4,12 @@ import { useNavigation } from '@react-navigation/native';
 
 import HeaderTitle from '../../components/HeaderTitle';
 import logo from '../../../assets/images/home-icon.png';
+import edit from '../../../assets/images/edit.png';
+import info from '../../../assets/images/info.png'
+import CustomCard from '../../components/CustomCard';
 
 const MainScreen = () => {
-  //const navigation = useNavigation(); // Hook para acessar a navegação
+  const navigation = useNavigation(); // Hook para acessar a navegação
 
   return (
     <View style={styles.container}>
@@ -16,7 +19,16 @@ const MainScreen = () => {
       </View>
 
       <View style={styles.bottomContainer}>
-
+        <CustomCard 
+          icon={edit}
+          text="Criar Pedido"
+          onPress={() => navigation.navigate()}
+        />
+        <CustomCard 
+          icon={info}
+          text="Monitorar Pedidos"
+          onPress={() => navigation.navigate()}
+        />
       </View>
     </View>
   );
