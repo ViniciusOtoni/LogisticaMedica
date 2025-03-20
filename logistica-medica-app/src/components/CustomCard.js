@@ -1,12 +1,11 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, Image } from 'react-native';
+import { TouchableOpacity,  StyleSheet} from 'react-native';
+import HeaderTitle from './HeaderTitle';
 
 const CustomCard = ({
   text,
   onPress,
-  backgroundColor = '#FFF',
-  borderColor = '#119FDC',       
-  textColor = '#000',          
+  borderColor = '#119FDC',                
   borderWidth = 2,
   icon              
 }) => {
@@ -15,27 +14,27 @@ const CustomCard = ({
       style={[
         styles.container,
         {
-          backgroundColor,
           borderColor,
           borderWidth,
         },
       ]}
-      onPress={onPress}
+      {...(onPress && { onPress })}
     > 
-      {icon && <Image source={icon} style={styles.icon} resizeMode='contain' />}
-      <Text style={[styles.cardText, { color: textColor }]}>{text}</Text>
+      <HeaderTitle icon={icon} text={text}> </HeaderTitle>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: "#FFFFFF",
     flexDirection: 'row',
-    height: 200,
+    flex: 1,
     paddingVertical: 12,
     paddingHorizontal: 12,
     borderRadius: 10,
     marginVertical: 10,
+    alignItems: "flex-start"
   },
   icon: {
     width: 24,
@@ -43,6 +42,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   cardText: {
+    color: "#FFFFFF",
     fontSize: 20,
   },
 });
