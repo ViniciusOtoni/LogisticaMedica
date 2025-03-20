@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 import MedFlowLogo from '../../components/MedFlowLogo';
 import Title from '../../components/Title';
@@ -7,12 +8,14 @@ import LabeledInput from '../../components/LabeledInput';
 import CustomButton from '../../components/CustomButton';
 
 const LoginScreen = () => {
+  const navigation = useNavigation();
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
 
   const handleLogin = () => {
     console.log('Email:', email);
     console.log('Senha:', senha);
+    navigation.navigate('MainScreen'); // apenas para facilitar a navegação p/ tela inicial por enquanto
   };
 
   return (
