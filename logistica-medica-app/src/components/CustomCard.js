@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet, View } from 'react-native';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import HeaderTitle from './HeaderTitle';
 
 const CustomCard = ({
@@ -8,47 +8,38 @@ const CustomCard = ({
   borderColor = '#119FDC',
   borderWidth = 2,
   icon,
-  children //componentes "extras"
+  children
 }) => {
+  // Se onPress existir, usa TouchableOpacity; caso contrário, usa View.
+  const Container = onPress ? TouchableOpacity : View;
+
   return (
-    <TouchableOpacity
+    <Container
       style={[
         styles.container,
-        {
-          borderColor,
-          borderWidth,
-        },
+        { borderColor, borderWidth }
       ]}
-      {...(onPress && { onPress })}
+      {...(onPress ? { onPress, activeOpacity: 0.7 } : {})}
     >
-      <View style={{ flex: 1, width: '100%' }}>
+      <View style={{ width: '100%' }}>
         <HeaderTitle icon={icon} text={text} />
         {children}
       </View>
-    </TouchableOpacity>
+    </Container>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
-    flexDirection: 'column', // Coloca os filhos em coluna
     flex: 1,
+    backgroundColor: '#FFFFFF',
+    flexDirection: 'column',
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 10,
     marginVertical: 8,
     alignItems: 'flex-start',
-  },
-  icon: {
-    width: 24,
-    height: 24,
-    marginRight: 8,
-  },
-  cardText: {
-    color: '#FFFFFF',
-    fontSize: 20,
-  },
+  }
 });
 
 export default CustomCard;

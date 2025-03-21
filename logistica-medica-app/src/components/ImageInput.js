@@ -16,7 +16,7 @@ const ImageInput = ({ initialImageUri = null }) => {
 
     // Abrir galeria
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ImagePicker.mediaTypes,
       quality: 0.7,
     });
 

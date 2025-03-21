@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Text, ScrollView } from 'react-native';
+import { View, StyleSheet, Text } from 'react-native';
 import details from '../../../assets/images/details-icon.png';
 
 import HeaderTitle from '../../components/HeaderTitle';
@@ -19,8 +19,8 @@ const OrderDetails = () => {
                 text={"Previsão de Entrega:"}
                 borderColor="#DC1111"
             >
-                
-                <View style={styles.row}> 
+                <View style={styles.padding}> <Text> Data: {"18/12/2005"} </Text> </View>
+                <View style={[styles.row, styles.padding]}> 
                     <View> <Text> Laboratório 01 → </Text> </View>
                     <View> <Text>  Laboratório 15 </Text> </View> 
                 </View>
@@ -79,13 +79,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#119FDC',
   },
   topContainer: {
-    alignItems: 'left',
+    alignItems: 'flex-start',
     paddingVertical: 10,
     paddingHorizontal: 20
   },
   titleWrapper: {
     alignItems: 'flex-start',
-    marginTop: 16
+    marginTop: 8
   },
   bottomContainer: {
     flex: 1,
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row'
   },
   padding: {
-    paddingTop: 8
+    paddingTop: 4
   },
   buttons: {
     flexDirection: 'row',
