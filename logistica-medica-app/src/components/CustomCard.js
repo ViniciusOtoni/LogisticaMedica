@@ -1,13 +1,14 @@
 import React from 'react';
-import { TouchableOpacity,  StyleSheet} from 'react-native';
+import { TouchableOpacity, StyleSheet, View } from 'react-native';
 import HeaderTitle from './HeaderTitle';
 
 const CustomCard = ({
   text,
   onPress,
-  borderColor = '#119FDC',                
+  borderColor = '#119FDC',
   borderWidth = 2,
-  icon              
+  icon,
+  children //componentes "extras"
 }) => {
   return (
     <TouchableOpacity
@@ -19,22 +20,25 @@ const CustomCard = ({
         },
       ]}
       {...(onPress && { onPress })}
-    > 
-      <HeaderTitle icon={icon} text={text}> </HeaderTitle>
+    >
+      <View style={{ flex: 1, width: '100%' }}>
+        <HeaderTitle icon={icon} text={text} />
+        {children}
+      </View>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#FFFFFF",
-    flexDirection: 'row',
+    backgroundColor: '#FFFFFF',
+    flexDirection: 'column', // Coloca os filhos em coluna
     flex: 1,
-    paddingVertical: 12,
+    paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 10,
-    marginVertical: 10,
-    alignItems: "flex-start"
+    marginVertical: 8,
+    alignItems: 'flex-start',
   },
   icon: {
     width: 24,
@@ -42,7 +46,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   cardText: {
-    color: "#FFFFFF",
+    color: '#FFFFFF',
     fontSize: 20,
   },
 });
