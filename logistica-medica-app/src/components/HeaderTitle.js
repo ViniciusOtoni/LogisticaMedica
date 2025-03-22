@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   title: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: 'bold',
   },
 });
