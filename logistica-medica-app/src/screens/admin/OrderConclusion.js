@@ -104,7 +104,7 @@ const OrderConclusion = () => {
 
 const styles = StyleSheet.create({
   scrollContainer: {
-    flexGrow: 1, // Garante que o conteúdo ocupe a tela inteira, permitindo a rolagem se necessário
+    flexGrow: 1, 
   },
   container: {
     flex: 1,

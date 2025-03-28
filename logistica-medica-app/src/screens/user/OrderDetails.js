@@ -101,7 +101,7 @@ const OrderDetails = () => {
 
 const styles = StyleSheet.create({
   scrollContainer: {
-    flexGrow: 1, // Garante que o conteúdo ocupe a tela inteira
+    flexGrow: 1, 
   },
   container: {
     flex: 1,

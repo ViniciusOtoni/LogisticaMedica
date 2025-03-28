@@ -100,7 +100,7 @@ const ListOrders = () => {
 
 const styles = StyleSheet.create({
   scrollContainer: {
-    flexGrow: 1, // Garante que o conteúdo ocupe toda a altura da tela, permitindo a rolagem
+    flexGrow: 1,
   },
   container: {
     flex: 1,
