@@ -92,6 +92,8 @@ const OrderDetails = () => {
                 />
               </View>
             </View>
+
+            <CustomSectionLabel label={"Urgente"} color="#DC1111" />
           </CustomCard>
         </View>
       </View>
