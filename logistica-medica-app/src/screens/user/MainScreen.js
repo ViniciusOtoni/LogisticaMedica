@@ -22,12 +22,12 @@ const MainScreen = () => {
         <CustomCard 
           icon={edit}
           text="Criar Pedido"
-          onPress={() => navigation.navigate()}
+          onPress={() => navigation.navigate("NewOrder")}
         />
         <CustomCard 
           icon={info}
           text="Monitorar Pedidos"
-          onPress={() => navigation.navigate()}
+          onPress={() => navigation.navigate("ListOrders")}
         />
       </View>
     </View>
