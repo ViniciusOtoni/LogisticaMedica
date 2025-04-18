@@ -22,7 +22,8 @@
     "react-native-image-picker": "^8.2.0",
     "react-native-modal-datetime-picker": "^18.0.0",
     "react-native-safe-area-context": "^5.3.0",
-    "react-native-screens": "^4.9.2"
+    "react-native-screens": "^4.9.2",
+    "expo-sqlite": "~15.1.4"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
