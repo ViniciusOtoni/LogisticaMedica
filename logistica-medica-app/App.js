@@ -1,8 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import { createTables } from './src/utils/services/setup/createTables';
 
 import LoginAdmin from './src/screens/admin/LoginAdmin';
 import LoginScreen from './src/screens/user/Login';
@@ -15,18 +14,11 @@ import NewOrder from './src/screens/user/NewOrder';
 import OrderDetails from './src/screens/user/OrderDetails';
 import ListOrdersAdmin from './src/screens/admin/ListOrdersAdmin';
 import OrderConclusion from './src/screens/admin/OrderConclusion';
-import { initDb } from './src/utils/database';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-  useEffect(() => {
-    (async () => {
-      await initDb();
-      await createTables();
-    })();
-  }, []);
-
+  
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName={"Login"}>

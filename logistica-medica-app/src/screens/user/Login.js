@@ -6,21 +6,21 @@ import MedFlowLogo from '../../components/MedFlowLogo';
 import Title from '../../components/Title';
 import LabeledInput from '../../components/LabeledInput';
 import CustomButton from '../../components/CustomButton';
-import { loginUser } from '../../utils/services/user/userService';
+// import { loginUser } from '../../utils/services/user/userService';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
 
-  const handleLogin = async () => {
-    try {
-      const user = await loginUser(email, senha);
-      navigation.navigate('MainScreen', { user });
-    } catch (error) {
-      Alert.alert('Erro ao logar.', error.message);
-    }
-  };
+  // const handleLogin = async () => {
+  //   try {
+  //     const user = await loginUser(email, senha);
+  //     navigation.navigate('MainScreen', { user });
+  //   } catch (error) {
+  //     Alert.alert('Erro ao logar.', error.message);
+  //   }
+  // };
 
   return (
     <View style={styles.container}>
@@ -51,7 +51,7 @@ const LoginScreen = () => {
         />
 
         
-        <CustomButton text="Entrar" color="#119FDC" onPress={handleLogin} />
+        <CustomButton text="Entrar" color="#119FDC"  />
       </View>
     </View>
   );
