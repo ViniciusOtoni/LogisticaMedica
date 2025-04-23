@@ -6,32 +6,39 @@ import MedFlowLogo from '../../components/MedFlowLogo';
 import Title from '../../components/Title';
 import LabeledInput from '../../components/LabeledInput';
 import CustomButton from '../../components/CustomButton';
-// import { loginUser } from '../../utils/services/user/userService';
+
+import { loginUser } from '../../utils/services/user/userServices';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  // const handleLogin = async () => {
-  //   try {
-  //     const user = await loginUser(email, senha);
-  //     navigation.navigate('MainScreen', { user });
-  //   } catch (error) {
-  //     Alert.alert('Erro ao logar.', error.message);
-  //   }
-  // };
+  const handleLogin = async () => {
+    if (!email || !senha) {
+      return Alert.alert('Atenção', 'Preencha email e senha');
+    }
+    setLoading(true);
+    try {
+      const user = await loginUser(email, senha);
+      navigation.navigate('MainScreen', { user });
+    } catch (error) {
+      Alert.alert('Erro ao logar', error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
-      
       <View style={styles.topContainer}>
         <MedFlowLogo />
       </View>
 
       <View style={styles.bottomContainer}>
         <Title text={"Bem-vindo de\nvolta"} color="#119FDC" />
-        
+
         <LabeledInput
           label="Email"
           value={email}
@@ -50,8 +57,12 @@ const LoginScreen = () => {
           secureTextEntry
         />
 
-        
-        <CustomButton text="Entrar" color="#119FDC"  />
+        <CustomButton
+          text={loading ? 'Entrando...' : 'Entrar'}
+          color="#119FDC"
+          onPress={handleLogin}
+          disabled={loading}
+        />
       </View>
     </View>
   );
