@@ -10,23 +10,27 @@ function resolveUri(uri) {
   if (uri.startsWith('http') || uri.startsWith('file://')) {
     return uri;
   }
-  // remove leading "./" if present
-  const cleanPath = uri.replace(/^\.\//, '');
+  const cleanPath = uri
+    .replace(/^\.\//, '')
+    .replace(/\\/g, '/');      
   return `${SERVER_URL}/${cleanPath}`;
 }
+
 
 const ImageInput = ({ initialImageUri = null, onImageSelected }) => {
   const [imageUri, setImageUri] = useState(resolveUri(initialImageUri));
 
-  // if the parent passes a new initialImageUri, update the state
   useEffect(() => {
-    setImageUri(resolveUri(initialImageUri));
-  }, [initialImageUri]);
+    const resolved = resolveUri(initialImageUri);
+    setImageUri(resolved);
+  }, [initialImageUri]);  
+  
 
   const handleSelectImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
-      return Alert.alert('Permissão', 'Precisamos de permissão para acessar suas fotos!');
+      Alert.alert('Permissão', 'Precisamos de permissão para acessar suas fotos!');
+      return;
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({

@@ -32,10 +32,12 @@ const OrderDetails = () => {
 
   useEffect(() => {
     if (currentOrder.imagem) {
-      const cleanPath = currentOrder.imagem.replace(/^\/+/, '');
+      const cleanPath = currentOrder.imagem
+        .replace(/^\/+/, '')
+        .replace(/\\/g, '/');     
       setCurrentImageUri(`${BACKEND_URL}/${cleanPath}`);
     }
-  }, [currentOrder.imagem]);
+  }, [currentOrder.imagem]);;
 
   useFocusEffect(
     useCallback(() => {
@@ -51,7 +53,7 @@ const OrderDetails = () => {
       };
 
       fetchOrderDetails();
-    }, [])
+    }, []),
   );
 
   const handleImageSelected = async (localUri) => {
@@ -109,6 +111,7 @@ const OrderDetails = () => {
               initialImageUri={currentImageUri}
               onImageSelected={handleImageSelected}
             />
+
             <CustomButton
               text="Editar Pedido"
               textColor="#119FDC"
@@ -126,19 +129,20 @@ const OrderDetails = () => {
 
             <View style={styles.actions}>
               {currentOrder.concluido ? (
-                <View style={styles.fullWidthButton}>
+                <View style={styles.buttonGrow}> 
                   <CustomButton
                     text="Voltar"
                     textColor="#DC1111"
                     backgroundColor="transparent"
                     borderColor="#DC1111"
                     borderWidth={2}
+                    fullWidth
                     onPress={() => navigation.goBack()}
                   />
                 </View>
               ) : (
                 <>
-                  <View style={styles.buttonWrapper}>
+                  <View style={styles.buttonGrow}> 
                     <CustomButton
                       text="Concluir Pedido"
                       textColor="#11DC18"
@@ -148,7 +152,7 @@ const OrderDetails = () => {
                       onPress={handleComplete}
                     />
                   </View>
-                  <View style={styles.buttonWrapper}>
+                  <View style={styles.buttonGrow}>
                     <CustomButton
                       text="Voltar"
                       textColor="#DC1111"
@@ -170,34 +174,33 @@ const OrderDetails = () => {
 
 const styles = StyleSheet.create({
   scrollContainer: { flexGrow: 1 },
-  container: { flex: 1, backgroundColor: "#119FDC" },
+  container: { flex: 1, backgroundColor: '#119FDC' },
   topContainer: {
-    alignItems: "flex-start",
+    alignItems: 'flex-start',
     paddingVertical: 6,
     paddingHorizontal: 20,
   },
   titleWrapper: {
-    alignItems: "flex-start",
+    alignItems: 'flex-start',
     marginTop: 12,
   },
   bottomContainer: {
     flex: 1,
-    backgroundColor: "#FFF",
+    backgroundColor: '#FFF',
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     padding: 16,
   },
-  row: { flexDirection: "row" },
-  bold: { fontWeight: "bold" },
+  row: { flexDirection: 'row' },
+  bold: { fontWeight: 'bold' },
   padding: { paddingTop: 4 },
   actions: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     marginTop: 16,
-    gap: 16
+    gap: 16,
   },
-  buttonWrapper: { flex: 1 },
-  fullWidthButton: {
+  buttonGrow: {
     flex: 1
   }
 });
