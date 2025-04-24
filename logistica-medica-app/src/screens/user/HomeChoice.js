@@ -1,16 +1,15 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import MedFlowLogo from '../../components/MedFlowLogo';
 import CustomButton from '../../components/CustomButton';
 
 const HomeChoice = () => {
-  const navigation = useNavigation(); // Hook para acessar a navegação
+  const navigation = useNavigation();
 
   return (
     <View style={styles.container}>
-      
       <View style={styles.topContainer}>
         <MedFlowLogo />
       </View>
@@ -22,17 +21,25 @@ const HomeChoice = () => {
           backgroundColor="transparent"
           borderColor="#119FDC"
           borderWidth={2}
-          onPress={() => navigation.navigate('SignUp')} 
+          onPress={() => navigation.navigate('SignUp')}
         />
-        
+
         <CustomButton
           text="Entrar"
           textColor="#119FDC"
           backgroundColor="transparent"
           borderColor="#119FDC"
           borderWidth={2}
-          onPress={() => navigation.navigate('Login')} 
+          onPress={() => navigation.navigate('Login')}
         />
+        <TouchableOpacity
+          style={styles.admin}
+          onPress={() => navigation.navigate('LoginAdmin')}
+        >
+          <Text style={styles.textAdmin}>
+            Entrar como Admin
+          </Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -54,7 +61,16 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     padding: 16,
-  }
+  },
+  admin: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    paddingVertical: 8,
+  },
+  textAdmin: {
+    color: '#119FDC',
+    textDecorationLine: 'underline'
+  },
 });
 
 export default HomeChoice;

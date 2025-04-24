@@ -49,6 +49,7 @@ const LoginAdmin = () => {
 
         
         <CustomButton text="Entrar" color="#119FDC" onPress={handleLogin} />
+        <CustomButton text="Criar Conta" color="#119FDC" /> {/* criar tela de cadastrar admin (fazer endpoint...) */}
       </View>
     </View>
   );
