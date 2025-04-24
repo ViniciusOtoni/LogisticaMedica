@@ -65,13 +65,6 @@ const LoginScreen = () => {
           onPress={handleLogin}
           disabled={loading}
         />
-
-        <CustomButton
-          text="Criar Conta"
-          color="#119FDC"
-          onPress={() => navigation.navigate('SignUp')}
-          disabled={loading}
-        />
       </View>
     </View>
   );

@@ -10,7 +10,7 @@ import HomeChoice from './src/screens/user/HomeChoice';
 import MainScreen from './src/screens/user/MainScreen';
 import HomePage from './src/screens/user/HomePage';
 import ListOrders from './src/screens/user/ListOrders';
-import NewOrder from './src/screens/user/NewOrder';
+import OrderForm from './src/screens/user/NewOrder';
 import OrderDetails from './src/screens/user/OrderDetails';
 import ListOrdersAdmin from './src/screens/admin/ListOrdersAdmin';
 import OrderConclusion from './src/screens/admin/OrderConclusion';
@@ -22,7 +22,7 @@ export default function App() {
   return (
     <NavigationContainer>
        <AuthProvider> 
-        <Stack.Navigator initialRouteName={"Login"}>
+        <Stack.Navigator initialRouteName={"HomePage"}>
           <Stack.Screen name="HomeChoice" component={HomeChoice} options={{title: ''}}/>
           <Stack.Screen name="SignUp" component={SignUp} options={{title: ''}} />
           <Stack.Screen name="LoginAdmin" component={LoginAdmin} options={{title: ''}} />
@@ -30,7 +30,7 @@ export default function App() {
           <Stack.Screen name="MainScreen" component={MainScreen} options={{title: ''}}/>
           <Stack.Screen name="HomePage" component={HomePage} options={{title: ''}}/>
           <Stack.Screen name="ListOrders" component={ListOrders} options={{title: ''}}/>
-          <Stack.Screen name="NewOrder" component={NewOrder} options={{title: ''}}/>
+          <Stack.Screen name="OrderForm" component={OrderForm} options={{title: ''}}/>
           <Stack.Screen name="OrderDetails" component={OrderDetails} options={{title: ''}}/>
           <Stack.Screen name="ListOrdersAdmin" component={ListOrdersAdmin} options={{title: ''}}/>
           <Stack.Screen name="OrderConclusion" component={OrderConclusion} options={{title: ''}}/>

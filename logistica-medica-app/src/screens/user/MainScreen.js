@@ -40,7 +40,7 @@ const MainScreen = () => {
         <CustomCard
           icon={edit}
           text="Criar Pedido"
-          onPress={() => navigation.navigate('NewOrder', { user })}
+          onPress={() => navigation.navigate('OrderForm', { user })}
         />
         <CustomCard
           icon={info}

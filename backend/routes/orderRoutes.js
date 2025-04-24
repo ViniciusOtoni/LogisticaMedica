@@ -133,4 +133,38 @@ orderRouter.patch('/:orderId/complete', async (req, res) => {
   }
 });
 
+// Atualiza todas as informações de um pedido
+orderRouter.put('/:orderId', async (req, res) => {
+  const { orderId } = req.params;
+  const { remetente, destinatario, prazoEntrega, urgencia, detalhes, userId } = req.body;
+
+  if (!remetente || !destinatario || !prazoEntrega || !urgencia || !detalhes || !userId) {
+    console.warn('Payload inválido para atualização:', req.body);
+    return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
+  }
+
+  try {
+    const [result] = await pool.execute(
+      `UPDATE orders
+         SET remetente      = ?,
+             destinatario   = ?,
+             prazo_entrega  = ?,
+             urgencia       = ?,
+             detalhes       = ?,
+             user_id        = ?
+       WHERE id = ?`,
+      [remetente, destinatario, prazoEntrega, urgencia, detalhes, userId, orderId]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Pedido não encontrado.' });
+    }
+
+    return res.json({ message: 'Pedido atualizado com sucesso.' });
+  } catch (err) {
+    console.error(`Erro ao atualizar pedido ${orderId}:`, err);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 export default orderRouter;

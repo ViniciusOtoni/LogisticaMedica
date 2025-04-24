@@ -1,52 +1,78 @@
-import React from "react";
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
-  StyleSheet,
   Text,
   ScrollView,
+  StyleSheet,
   Alert
-} from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
+} from 'react-native';
+import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 
-import details from "../../../assets/images/details-icon.png";
-import HeaderTitle from "../../components/HeaderTitle";
-import ImageInput from "../../components/ImageInput";
-import CustomCard from "../../components/CustomCard";
-import CustomButton from "../../components/CustomButton";
-import CustomSectionLabel from "../../components/SectionLabel";
-import Title from "../../components/Title";
-
+import details from '../../../assets/images/details-icon.png';
+import HeaderTitle from '../../components/HeaderTitle';
+import ImageInput from '../../components/ImageInput';
+import CustomCard from '../../components/CustomCard';
+import CustomButton from '../../components/CustomButton';
+import Title from '../../components/Title';
 
 import {
   uploadOrderImage,
-  completeOrder
+  completeOrder,
+  getOrderById
 } from '../../utils/services/order/orderServices';
+
+const BACKEND_URL = 'http://192.168.0.54:3000';
 
 const OrderDetails = () => {
   const navigation = useNavigation();
-  const { order } = useRoute().params;
+  const { order, user } = useRoute().params;
 
-  const BACKEND_URL = "http://192.168.0.54:3000";
-  const imagePath = order.imagem ? `${BACKEND_URL}/uploads/${order.imagem}` : null;
+  const [currentOrder, setCurrentOrder] = useState(order);
+  const [currentImageUri, setCurrentImageUri] = useState(null);
 
-  const handleImageSelected = async (uri) => {
-    const { success, message } = await uploadOrderImage(order.id, uri);
+  useEffect(() => {
+    if (currentOrder.imagem) {
+      const cleanPath = currentOrder.imagem.replace(/^\/+/, '');
+      setCurrentImageUri(`${BACKEND_URL}/${cleanPath}`);
+    }
+  }, [currentOrder.imagem]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchOrderDetails = async () => {
+        try {
+          const { success, data } = await getOrderById(order.id);
+          if (success) {
+            setCurrentOrder(data);
+          }
+        } catch (err) {
+          console.error('Erro ao obter detalhes do pedido:', err);
+        }
+      };
+
+      fetchOrderDetails();
+    }, [])
+  );
+
+  const handleImageSelected = async (localUri) => {
+    const { success, imagem, message } = await uploadOrderImage(currentOrder.id, localUri);
     if (success) {
-      Alert.alert("Sucesso", "Imagem enviada!");
-      Alert.alert(order.imagem)
+      const cleanPath = imagem.replace(/^\/+/, '');
+      setCurrentImageUri(`${BACKEND_URL}/${cleanPath}`);
+      Alert.alert('Sucesso', 'Imagem enviada!');
     } else {
-      Alert.alert("Erro", message);
+      Alert.alert('Erro', message);
     }
   };
 
   const handleComplete = async () => {
-    const { success, message } = await completeOrder(order.id);
+    const { success, message } = await completeOrder(currentOrder.id);
     if (success) {
-      Alert.alert("Sucesso", "Pedido concluído!", [
-        { text: "OK", onPress: () => navigation.goBack() }
+      Alert.alert('Sucesso', 'Pedido concluído!', [
+        { text: 'OK', onPress: () => navigation.goBack() }
       ]);
     } else {
-      Alert.alert("Erro", message);
+      Alert.alert('Erro', message);
     }
   };
 
@@ -62,52 +88,78 @@ const OrderDetails = () => {
         </View>
         <View style={styles.bottomContainer}>
           <CustomCard
-            text={`Previsão de Entrega: ${new Date(order.prazoEntrega)
-              .toLocaleDateString()}`}
+            text={`Previsão de Entrega: ${new Date(currentOrder.prazoEntrega).toLocaleDateString()}`}
             borderColor="#DC1111"
           >
             <View style={styles.padding}>
-              <Text>Remetente: {order.remetente}</Text>
+              <Text>Remetente: {currentOrder.remetente}</Text>
             </View>
             <View style={[styles.row, styles.padding]}>
               <Text style={styles.bold}>Destinatário: </Text>
-              <Text>{order.destinatario}</Text>
+              <Text>{currentOrder.destinatario}</Text>
             </View>
             <View style={styles.padding}>
-              <Text>Detalhes: {order.detalhes}</Text>
+              <Text>Detalhes: {currentOrder.detalhes}</Text>
             </View>
 
             <View style={styles.titleWrapper}>
               <Title text="Adicionar Evidência:" />
             </View>
             <ImageInput
-              initialImageUri={imagePath}
+              initialImageUri={currentImageUri}
               onImageSelected={handleImageSelected}
             />
+            <CustomButton
+              text="Editar Pedido"
+              textColor="#119FDC"
+              backgroundColor="transparent"
+              borderColor="#119FDC"
+              borderWidth={2}
+              onPress={() =>
+                navigation.navigate('OrderForm', {
+                  user,
+                  order: currentOrder,
+                  isEdit: true
+                })
+              }
+            />
 
-            <View style={styles.buttons}>
-              {!order.concluido && (
-                <View style={styles.buttonWrapper}>
+            <View style={styles.actions}>
+              {currentOrder.concluido ? (
+                <View style={styles.fullWidthButton}>
                   <CustomButton
-                    text="Concluir Pedido"
-                    textColor="#11DC18"
+                    text="Voltar"
+                    textColor="#DC1111"
                     backgroundColor="transparent"
-                    borderColor="#11DC18"
+                    borderColor="#DC1111"
                     borderWidth={2}
-                    onPress={handleComplete}
+                    onPress={() => navigation.goBack()}
                   />
                 </View>
+              ) : (
+                <>
+                  <View style={styles.buttonWrapper}>
+                    <CustomButton
+                      text="Concluir Pedido"
+                      textColor="#11DC18"
+                      backgroundColor="transparent"
+                      borderColor="#11DC18"
+                      borderWidth={2}
+                      onPress={handleComplete}
+                    />
+                  </View>
+                  <View style={styles.buttonWrapper}>
+                    <CustomButton
+                      text="Voltar"
+                      textColor="#DC1111"
+                      backgroundColor="transparent"
+                      borderColor="#DC1111"
+                      borderWidth={2}
+                      onPress={() => navigation.goBack()}
+                    />
+                  </View>
+                </>
               )}
-              <View style={styles.buttonWrapper}>
-                <CustomButton
-                  text="Voltar"
-                  textColor="#DC1111"
-                  backgroundColor="transparent"
-                  borderColor="#DC1111"
-                  borderWidth={2}
-                  onPress={() => navigation.goBack()}
-                />
-              </View>
             </View>
           </CustomCard>
         </View>
@@ -138,8 +190,16 @@ const styles = StyleSheet.create({
   row: { flexDirection: "row" },
   bold: { fontWeight: "bold" },
   padding: { paddingTop: 4 },
-  buttons: { flexDirection: "row", gap: 10, marginTop: 16 },
+  actions: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    marginTop: 16,
+    gap: 16
+  },
   buttonWrapper: { flex: 1 },
+  fullWidthButton: {
+    flex: 1
+  }
 });
 
 export default OrderDetails;

@@ -16,9 +16,15 @@ const DateInput = ({
   const hidePicker = () => setIsVisible(false);
 
   const handleConfirm = (date) => {
+    const onlyDate = new Date(date);
+    onlyDate.setHours(0, 0, 0, 0);
     hidePicker();
-    onChange(date);
+    onChange(onlyDate);
   };
+
+  const displayValue = value
+    ? value.toISOString().split('T')[0]
+    : placeholder;
 
   return (
     <View style={styles.container}>
@@ -28,7 +34,7 @@ const DateInput = ({
         onPress={showPicker}
       >
         <Text style={{ color: value ? textColor : 'gray' }}>
-          {value ? value.toLocaleDateString() : placeholder}
+          {displayValue}
         </Text>
       </TouchableOpacity>
 

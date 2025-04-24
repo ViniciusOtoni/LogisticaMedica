@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Text, ScrollView, Image, Alert } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import React, { useState, useEffect, useCallback } from "react";
+import { View, StyleSheet, Text, ScrollView, Alert } from 'react-native';
+import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 
 import HeaderTitle from "../../components/HeaderTitle";
 import CustomCard from "../../components/CustomCard";
@@ -9,11 +9,13 @@ import CustomSectionLabel from "../../components/SectionLabel";
 import LabeledInput from "../../components/LabeledInput";
 import analysing from "../../../assets/images/analyse.png";
 
-import {
-  getOrdersByUser,
-  getOrderById,
-  completeOrder
-} from '../../utils/services/order/orderServices';
+import { getOrdersByUser, getOrderById } from '../../utils/services/order/orderServices';
+
+// Função para formatar a data
+const formatDate = (datetime) => {
+  const date = new Date(datetime);
+  return `${date.getFullYear()}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}`;
+};
 
 const ListOrders = () => {
   const navigation = useNavigation();
@@ -26,24 +28,6 @@ const ListOrders = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchOrders();
-  }, []);
-
-  useEffect(() => {
-    if (search.trim()) {
-      const lower = search.toLowerCase();
-      setFilteredOrders(
-        orders.filter(o =>
-          o.destinatario.toLowerCase().includes(lower) ||
-          o.remetente.toLowerCase().includes(lower)
-        )
-      );
-    } else {
-      setFilteredOrders(orders);
-    }
-  }, [search, orders]);
-
   const fetchOrders = async () => {
     setLoading(true);
     try {
@@ -51,18 +35,38 @@ const ListOrders = () => {
       setOrders(data);
       setFilteredOrders(data);
     } catch (err) {
-      console.error('Erro ao carregar pedidos:', err);
       setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+    const lowerSearch = search.trim().toLowerCase();
+    
+    if (lowerSearch) {
+      setFilteredOrders(
+        orders.filter(o =>
+          o.destinatario.toLowerCase().includes(lowerSearch) ||
+          o.remetente.toLowerCase().includes(lowerSearch)
+        )
+      );
+    } else {
+      setFilteredOrders(orders);
+    }
+  }, [search, orders]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchOrders();
+    }, [])
+  );
+
   const handleSelectOrder = async (orderId) => {
     try {
       const { success, data, message } = await getOrderById(orderId);
       if (success) {
-        navigation.navigate('OrderDetails', { order: data });
+        navigation.navigate('OrderDetails', { order: data, user, refreshOrders: fetchOrders });
       } else {
         Alert.alert('Erro', message);
       }
@@ -70,7 +74,6 @@ const ListOrders = () => {
       Alert.alert('Erro de conexão', err.message);
     }
   };
-
 
   const pendingOrders = filteredOrders.filter(o => !o.concluido);
   const completedOrders = filteredOrders.filter(o => o.concluido);
@@ -93,38 +96,38 @@ const ListOrders = () => {
             />
           </View>
 
-          <CustomButton
-            text="Gerar Relatório"
-            textColor="#119FDC"
-            backgroundColor="transparent"
-            borderColor="#119FDC"
-            borderWidth={2}
-            onPress={() => {/* implementar geração de relatório */}}
-          />
-
           {loading && <Text style={styles.infoText}>Carregando pedidos...</Text>}
           {error && <Text style={styles.errorText}>{error}</Text>}
 
           <CustomSectionLabel label="Pendente" color="#DC1111" />
-          {pendingOrders.length > 0 ? (
+          {pendingOrders.length === 1 ? (
+            <View>
+              <CustomCard
+                key={pendingOrders[0].id}
+                text={`Previsão de Entrega: ${formatDate(pendingOrders[0].prazoEntrega)}`}
+                borderColor="#DC1111"
+                onPress={() => handleSelectOrder(pendingOrders[0].id)}
+              >
+                <View style={[styles.row, styles.textContainer]}>
+                  <Text style={styles.bold}>{pendingOrders[0].remetente} → </Text>
+                  <Text style={styles.bold}>{pendingOrders[0].destinatario}</Text>
+                </View>
+              </CustomCard>
+            </View>
+          ) : (
             pendingOrders.map(order => (
               <CustomCard
                 key={order.id}
-                text={`Previsão de Entrega: ${order.prazoEntrega}`}
+                text={`Previsão de Entrega: ${formatDate(order.prazoEntrega)}`}
                 borderColor="#DC1111"
                 onPress={() => handleSelectOrder(order.id)}
               >
-                {order.imagem && (
-                  <Image source={{ uri: order.imagem }} style={styles.thumb} />
-                )}
-                <View style={[styles.row, styles.padding]}>  
+                <View style={[styles.row, styles.textContainer]}>
                   <Text style={styles.bold}>{order.remetente} → </Text>
                   <Text style={styles.bold}>{order.destinatario}</Text>
                 </View>
               </CustomCard>
             ))
-          ) : (
-            <Text style={styles.infoText}>Nenhum pedido pendente.</Text>
           )}
 
           <CustomSectionLabel label="Concluído" color="#11DC18" />
@@ -132,14 +135,11 @@ const ListOrders = () => {
             completedOrders.map(order => (
               <CustomCard
                 key={order.id}
-                text={`Previsão de Entrega: ${order.prazoEntrega}`}
+                text={`Previsão de Entrega: ${formatDate(order.prazoEntrega)}`}
                 borderColor="#11DC18"
                 onPress={() => handleSelectOrder(order.id)}
               >
-                {order.imagem && (
-                  <Image source={{ uri: order.imagem }} style={styles.thumb} />
-                )}
-                <View style={[styles.row, styles.padding]}>  
+                <View style={[styles.row, styles.textContainer]}>
                   <Text style={styles.bold}>{order.remetente} → </Text>
                   <Text style={styles.bold}>{order.destinatario}</Text>
                 </View>
@@ -168,16 +168,12 @@ const styles = StyleSheet.create({
   searchContainer: { marginBottom: 12 },
   bold: { fontWeight: "bold" },
   row: { flexDirection: "row" },
-  padding: { paddingTop: 8 },
+  textContainer: {
+    maxWidth: '90%',
+    flexWrap: 'wrap',
+  },
   infoText: { textAlign: 'center', marginVertical: 8, color: '#666' },
   errorText: { textAlign: 'center', marginVertical: 8, color: 'red' },
-  thumb: {
-    width: '100%',
-    height: 150,
-    borderRadius: 8,
-    marginBottom: 8,
-  },
-  buttonsRow: { marginTop: 8, alignItems: 'flex-end' },
 });
 
 export default ListOrders;

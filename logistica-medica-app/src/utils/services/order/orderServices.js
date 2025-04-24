@@ -155,3 +155,38 @@ export async function completeOrder(orderId) {
     return { success: false, message: err.message || 'Erro de conexão ao concluir pedido' };
   }
 }
+
+/**
+ * Atualiza todas as informações de um pedido.
+ * @param {number|string} orderId
+ * @param {Object} orderPayload
+ * @returns {Promise<{ success: boolean, message?: string }>}
+ */
+export async function updateOrder(orderId, orderPayload) {
+  const url = `${API_URL}/${orderId}`;
+  try {
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(orderPayload),
+    });
+
+    const text = await response.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      return { success: false, message: `Resposta inesperada do servidor: ${text}` };
+    }
+
+    if (!response.ok) {
+      return { success: false, message: data.error || 'Erro ao atualizar pedido' };
+    }
+
+    return { success: true, message: data.message };
+  } catch (err) {
+    console.error('updateOrder exception:', err);
+    return { success: false, message: err.message || 'Erro de conexão ao servidor' };
+  }
+}
+  

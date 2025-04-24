@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -16,28 +16,44 @@ import LabeledInput from '../../components/LabeledInput';
 import LabeledCheckbox from '../../components/CheckBoxInput';
 import DateInput from '../../components/DateInput';
 
-import { createOrder } from '../../utils/services/order/orderServices.js';
+import {
+  createOrder,
+  updateOrder
+} from '../../utils/services/order/orderServices.js';
 
-const NewOrder = () => {
+const OrderForm = () => {
   const navigation = useNavigation();
   const { params } = useRoute();
-  const { user } = params;
+  const { user, order = {}, isEdit = false } = params;
 
-  const [remetente, setRemetente] = useState(user.email);
-  const [destinatario, setDestinatario] = useState('');
-  const [detalhes, setDetalhes] = useState('');
-  const [selectedLevel, setSelectedLevel] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(null);
+  
+  const initialRemetente = isEdit
+    ? order.remetente
+    : user?.email || '';
+  const initialUserId = isEdit
+    ? order.userId
+    : user?.id;
 
-  const handleCreateOrder = async () => {
+  const [remetente, setRemetente] = useState(initialRemetente);
+  const [destinatario, setDestinatario] = useState(order.destinatario || '');
+  const [detalhes, setDetalhes] = useState(order.detalhes || '');
+  const [selectedLevel, setSelectedLevel] = useState(order.urgencia || null);
+  const [selectedDate, setSelectedDate] = useState(
+    order.prazoEntrega ? new Date(order.prazoEntrega) : null
+  );
+
+  useEffect(() => {
+    if (order.prazoEntrega) {
+      setSelectedDate(new Date(order.prazoEntrega));
+    }
+  }, [order.prazoEntrega]);
+
+  const handleSave = async () => {
     if (!destinatario || !selectedDate || !selectedLevel || !detalhes) {
       return Alert.alert('Atenção', 'Preencha todos os campos do pedido.');
     }
 
-    const formattedDate =
-      selectedDate instanceof Date
-        ? selectedDate.toISOString().split('T')[0]
-        : selectedDate;
+    const formattedDate = selectedDate.toISOString().split('T')[0];
 
     const payload = {
       remetente,
@@ -45,30 +61,33 @@ const NewOrder = () => {
       prazoEntrega: formattedDate,
       urgencia: selectedLevel,
       detalhes,
-      userId: user.id,
-      email: user.email,
-      senha: user.senha,
+      userId: initialUserId
     };
 
-    console.log('NewOrder: sending payload:', payload);
-
     try {
-      const result = await createOrder(payload);
-      console.log('NewOrder: createOrder result:', result);
+      let result;
+      if (isEdit) {
+        result = await updateOrder(order.id, payload);
+      } else {
+        result = await createOrder({
+          ...payload,
+          email: user.email,
+          senha: user.senha
+        });
+      }
 
       if (result.success) {
         Alert.alert(
           'Sucesso',
-          'Pedido criado com sucesso!',
+          isEdit ? 'Pedido atualizado com sucesso!' : 'Pedido criado com sucesso!',
           [{ text: 'OK', onPress: () => navigation.goBack() }]
         );
       } else {
-        console.error('NewOrder error message:', result.message);
-        Alert.alert('Erro ao criar pedido', result.message);
+        Alert.alert('Erro', result.message);
       }
     } catch (err) {
-      console.error('NewOrder exception:', err);
-      Alert.alert('Erro ao criar pedido', `Erro: ${err.message}`);
+      console.error('OrderForm exception:', err);
+      Alert.alert('Erro', `Erro: ${err.message}`);
     }
   };
 
@@ -77,13 +96,16 @@ const NewOrder = () => {
       <View style={styles.container}>
         <View style={styles.topContainer}>
           <HeaderTitle
-            text="Criar Pedido"
+            text={isEdit ? "Editar Pedido" : "Criar Pedido"}
             color="#FFFFFF"
             icon={createIcon}
           />
         </View>
         <View style={styles.bottomContainer}>
-          <CustomCard text="Novo Pedido:" borderColor="#119FDC">
+          <CustomCard
+            text={isEdit ? "Editar Pedido:" : "Novo Pedido:"}
+            borderColor="#119FDC"
+          >
             <View style={styles.padding}>
               <LabeledInput
                 label="Remetente"
@@ -142,12 +164,12 @@ const NewOrder = () => {
             <View style={styles.buttons}>
               <View style={styles.buttonWrapper}>
                 <CustomButton
-                  text="Criar Pedido"
+                  text={isEdit ? "Salvar Alterações" : "Criar Pedido"}
                   textColor="#11DC18"
                   backgroundColor="transparent"
                   borderColor="#11DC18"
                   borderWidth={2}
-                  onPress={handleCreateOrder}
+                  onPress={handleSave}
                 />
               </View>
               <View style={styles.buttonWrapper}>
@@ -184,8 +206,8 @@ const styles = StyleSheet.create({
   center: { justifyContent: "center" },
   space: { justifyContent: "space-evenly" },
   padding: { paddingTop: 4 },
-  buttons: { flexDirection: "row", gap: 10 },
+  buttons: { flexDirection: "row", gap: 10, marginTop: 16 },
   buttonWrapper: { flex: 1 },
 });
 
-export default NewOrder;
+export default OrderForm;
