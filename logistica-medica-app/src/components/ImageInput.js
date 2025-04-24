@@ -1,27 +1,43 @@
-import React, { useState } from 'react';
-import { View, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, TouchableOpacity, Image, StyleSheet, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import Icon from 'react-native-vector-icons/Feather';
 
-const ImageInput = ({ initialImageUri = null }) => {
-  const [imageUri, setImageUri] = useState(initialImageUri);
+const SERVER_URL = 'http://192.168.0.54:3000';
+
+function resolveUri(uri) {
+  if (!uri) return null;
+  if (uri.startsWith('http') || uri.startsWith('file://')) {
+    return uri;
+  }
+  // remove leading "./" if present
+  const cleanPath = uri.replace(/^\.\//, '');
+  return `${SERVER_URL}/${cleanPath}`;
+}
+
+const ImageInput = ({ initialImageUri = null, onImageSelected }) => {
+  const [imageUri, setImageUri] = useState(resolveUri(initialImageUri));
+
+  // if the parent passes a new initialImageUri, update the state
+  useEffect(() => {
+    setImageUri(resolveUri(initialImageUri));
+  }, [initialImageUri]);
 
   const handleSelectImage = async () => {
-    // Pedir permissão
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
-      alert('Precisamos de permissão para acessar suas fotos!');
-      return;
+      return Alert.alert('Permissão', 'Precisamos de permissão para acessar suas fotos!');
     }
 
-    // Abrir galeria
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.mediaTypes,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 0.7,
     });
 
     if (!result.canceled) {
-      setImageUri(result.assets[0].uri);
+      const localUri = result.assets[0].uri;
+      setImageUri(localUri);
+      onImageSelected?.(localUri);
     }
   };
 

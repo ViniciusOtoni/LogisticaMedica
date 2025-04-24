@@ -20,6 +20,26 @@ const createTables = async () => {
       )
     `);
 
+    // 3ª query: cria/verifica a tabela de orders com campos de imagem e concluido
+    // await pool.query('DROP TABLE IF EXISTS orders;');
+    // console.log('Tabela orders removida');
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS orders (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        remetente VARCHAR(255) NOT NULL,
+        destinatario VARCHAR(255) NOT NULL,
+        prazo_entrega DATE NOT NULL,
+        urgencia VARCHAR(50) NOT NULL,
+        detalhes TEXT,
+        imagem VARCHAR(255),               
+        concluido BOOLEAN NOT NULL DEFAULT FALSE,
+        user_id INT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
     console.log('Tabelas criadas/verificadas com sucesso');
   } catch (err) {
     console.error('Erro ao criar/verificar tabelas:', err);

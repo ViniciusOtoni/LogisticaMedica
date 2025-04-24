@@ -1,8 +1,8 @@
-// backend/index.js
 import express from 'express';
 import cors from 'cors';
 import userRouter from './routes/userRoutes.js';
 import adminRouter from './routes/adminRoutes.js';
+import orderRouter from './routes/orderRoutes.js';
 import createTables from './db/createTables.js';
 
 const app = express();
@@ -14,6 +14,7 @@ app.use(express.json());
 
 app.use('/api/users', userRouter);
 app.use('/api/admins', adminRouter);
+app.use('/api/orders', orderRouter);
 
 
 createTables();

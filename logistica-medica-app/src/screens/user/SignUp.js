@@ -6,33 +6,32 @@ import MedFlowLogo from '../../components/MedFlowLogo';
 import Title from '../../components/Title';
 import LabeledInput from '../../components/LabeledInput';
 import CustomButton from '../../components/CustomButton';
-// import { createUser } from '../../utils/services/user/userService';
-
+import { createUser } from '../../utils/services/user/userServices';
 
 const SignUp = () => {
   const navigation = useNavigation();
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
 
-  // const handleSignUp = async () => {
-  //   if (!email || !senha) {
-  //     Alert.alert("Atenção", "Por favor preencher todos os campos");
-  //   }
+  const handleSignUp = async () => {
+    if (!email || !senha) {
+      Alert.alert("Atenção", "Por favor preencher todos os campos");
+      return;
+    }
 
-  //   const result = await createUser(email, senha);
+    const result = await createUser(email, senha);
 
-  //   if (result.success) {
-  //     Alert.alert("Parabéns", "Usuário criado com sucesso!", [
-  //       { text: "Ok", onPress: () => navigation.navigate("Login") }
-  //     ]);
-  //   } else {
-  //     Alert.alert("Atenção", result.message || "Erro ao criar conta");
-  //   };
-  // };
+    if (result.success) {
+      Alert.alert("Parabéns", "Usuário criado com sucesso!", [
+        { text: "Ok", onPress: () => navigation.navigate("Login") }
+      ]);
+    } else {
+      Alert.alert("Atenção", result.message || "Erro ao criar conta");
+    }
+  };
 
   return (
     <View style={styles.container}>
-      
       <View style={styles.topContainer}>
         <MedFlowLogo />
       </View>
@@ -58,8 +57,7 @@ const SignUp = () => {
           secureTextEntry
         />
 
-        
-        <CustomButton text="Criar Conta" color="#119FDC" />
+        <CustomButton text="Criar Conta" color="#119FDC" onPress={handleSignUp} />
       </View>
     </View>
   );

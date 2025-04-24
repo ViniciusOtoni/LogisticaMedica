@@ -7,10 +7,11 @@ import Title from '../../components/Title';
 import LabeledInput from '../../components/LabeledInput';
 import CustomButton from '../../components/CustomButton';
 
-import { loginUser } from '../../utils/services/user/userServices';
+import { useAuth } from '../../utils/contexts/AuthContext.js';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
+  const { login, user } = useAuth();
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [loading, setLoading] = useState(false);
@@ -19,14 +20,15 @@ const LoginScreen = () => {
     if (!email || !senha) {
       return Alert.alert('Atenção', 'Preencha email e senha');
     }
+
     setLoading(true);
-    try {
-      const user = await loginUser(email, senha);
-      navigation.navigate('MainScreen', { user });
-    } catch (error) {
-      Alert.alert('Erro ao logar', error.message);
-    } finally {
-      setLoading(false);
+    const result = await login(email, senha);
+    setLoading(false);
+
+    if (result.success) {
+      navigation.replace('MainScreen', { user });
+    } else {
+      Alert.alert('Erro ao logar', result.message || 'Tente novamente');
     }
   };
 
@@ -61,6 +63,13 @@ const LoginScreen = () => {
           text={loading ? 'Entrando...' : 'Entrar'}
           color="#119FDC"
           onPress={handleLogin}
+          disabled={loading}
+        />
+
+        <CustomButton
+          text="Criar Conta"
+          color="#119FDC"
+          onPress={() => navigation.navigate('SignUp')}
           disabled={loading}
         />
       </View>
