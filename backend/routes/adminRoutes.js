@@ -29,4 +29,25 @@ adminRouter.post('/', async (req, res) => {
   }
 });
 
+adminRouter.post('/login', async (req, res) => {
+  const { email, senha } = req.body;
+
+  try {
+    const [rows] = await pool.execute(
+      'SELECT id, email FROM admins WHERE email = ? AND senha = ?',
+      [email, senha]
+    );
+
+    if (rows.length === 0) {
+      return res.status(401).json({ error: 'Credenciais inválidas'});
+    }
+
+    const admin = rows[0];
+    res.json({ id: admin.id, email: admin.email });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Erro ao realizar login' });
+  }
+});
+
 export default adminRouter;

@@ -14,6 +14,7 @@ import OrderForm from './src/screens/user/NewOrder';
 import OrderDetails from './src/screens/user/OrderDetails';
 import ListOrdersAdmin from './src/screens/admin/ListOrdersAdmin';
 import OrderConclusion from './src/screens/admin/OrderConclusion';
+import SignUpAdmin from './src/screens/admin/SignUpAdmin.js';
 
 const Stack = createNativeStackNavigator();
 
@@ -25,6 +26,7 @@ export default function App() {
         <Stack.Navigator initialRouteName={"HomePage"}>
           <Stack.Screen name="HomeChoice" component={HomeChoice} options={{title: ''}}/>
           <Stack.Screen name="SignUp" component={SignUp} options={{title: ''}} />
+          <Stack.Screen name="SignUpAdmin" component={SignUpAdmin} options={{title: ''}} />
           <Stack.Screen name="LoginAdmin" component={LoginAdmin} options={{title: ''}} />
           <Stack.Screen name="Login" component={LoginScreen} options={{title: ''}} />
           <Stack.Screen name="MainScreen" component={MainScreen} options={{title: ''}}/>

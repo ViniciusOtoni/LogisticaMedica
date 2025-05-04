@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
   },
   admin: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
     paddingVertical: 8,
   },
   textAdmin: {
