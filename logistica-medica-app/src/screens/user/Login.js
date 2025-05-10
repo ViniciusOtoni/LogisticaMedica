@@ -18,7 +18,7 @@ const LoginScreen = () => {
 
   const handleLogin = async () => {
     if (!email || !senha) {
-      return Alert.alert('Atenção', 'Preencha email e senha');
+      return Alert.alert('Atenção', 'Por favor, preencha email e senha');
     }
 
     setLoading(true);

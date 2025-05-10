@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import MedFlowLogo from '../../components/MedFlowLogo';
@@ -7,16 +7,29 @@ import Title from '../../components/Title';
 import LabeledInput from '../../components/LabeledInput';
 import CustomButton from '../../components/CustomButton';
 
+import { useAuth } from '../../utils/contexts/AuthContext';
+
 const LoginAdmin = () => {
   const navigation = useNavigation();
-  const [email, setEmail] = useState(''); //variavel de estado
+  const { loginAdm, admin } = useAuth();
+  const [email, setEmail] = useState(''); 
   const [senha, setSenha] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
-    //api de login aqui!!!
-    console.log('Email:', email);
-    console.log('Senha:', senha);
-    navigation.navigate('ListOrdersAdmin')
+  const handleLoginAdmin = async () => {
+    if (!email || !senha) {
+      return Alert.alert("Atenção", "Por favor, preencha todos os campos");
+    }
+
+    setLoading(true);
+    const result = await loginAdm(email, senha);
+    setLoading(false);
+
+    if (result.success) {
+      navigation.replace('ListOrdersAdmin', { admin });
+    } else {
+      Alert.alert("Erro ao logar", result.message || "Tente novamente");
+    }
   };
 
   return (
@@ -48,8 +61,12 @@ const LoginAdmin = () => {
         />
 
         
-        <CustomButton text="Entrar" color="#119FDC" onPress={handleLogin} />
-        <CustomButton text="Criar Conta" color="#119FDC" /> {/* criar tela de cadastrar admin (fazer endpoint...) */}
+        <CustomButton 
+          text={loading ? "Entrando..." : "Entrar"} 
+          color="#119FDC" 
+          onPress={handleLoginAdmin} 
+          disabled={loading}
+        />
       </View>
     </View>
   );
