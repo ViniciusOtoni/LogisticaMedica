@@ -15,7 +15,7 @@ const OrderConclusion = () => {
       <View style={styles.container}>
         <View style={styles.topContainer}>
           <HeaderTitle
-            text={"Detalhes do Pedido"}
+            text={"Conclusão do Pedido"}
             color="#FFFFFF"
             icon={details}
           />

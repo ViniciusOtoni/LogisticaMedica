@@ -139,7 +139,7 @@ const ListOrders = () => {
         <View style={styles.bottomContainer}>
           <View style={styles.searchContainer}>
             <LabeledInput
-              placeholder="Pesquisar..."
+              placeholder="Pesquisar"
               value={search}
               onChangeText={setSearch}
               borderColor="#119FDC"

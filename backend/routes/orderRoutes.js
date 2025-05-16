@@ -21,6 +21,30 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
+orderRouter.get('/', async (req, res) => {
+  try {
+    const [rows] = await pool.execute(
+      `SELECT
+        id,
+        remetente,
+        destinatario,
+        prazo_entrega AS prazoEntrega,
+        urgencia,
+        detalhes,
+        imagem,
+        concluido,
+        created_at,
+        user_id 
+      FROM orders
+      ORDER BY created_at DESC`
+    );
+    return res.json(rows);
+  } catch (err) {
+    console.error('Erro ao listar todos os pedidos: ', err);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 
 orderRouter.post('/', async (req, res) => {
   const { remetente, destinatario, prazoEntrega, urgencia, detalhes, userId } = req.body;
