@@ -64,19 +64,13 @@ const ListOrdersAdmin = () => {
     }, [])
   );
 
-  const handleSelectOrder = async (orderId) => {
-    try {
-      const { success, data, message } = await getOrderById(orderId);
-      
-      if (success) {
-        navigation.navigate('OrderConclusion', { order: data, refreshOrders: fetchOrders });
-      } else {
-        Alert.alert('Erro', message);
-      }
-    } catch (err) {
-      Alert.alert('Erro de conexão', err.message);
-    }
-  };
+const handleSelectOrder = async (orderId) => {
+  try {
+    navigation.navigate('OrderConclusion', { orderId: orderId, refreshOrders: fetchOrders });
+  } catch (err) {
+    Alert.alert('Erro de conexão', err.message);
+  }
+};
 
   const pendingOrders = filteredOrders.filter(o => !o.concluido);
   const completedOrders = filteredOrders.filter(o => o.concluido);

@@ -33,12 +33,19 @@ orderRouter.get('/', async (req, res) => {
         detalhes,
         imagem,
         concluido,
+        status,
+        issue_reason AS issueReason,
         created_at,
         user_id 
       FROM orders
       ORDER BY created_at DESC`
     );
-    return res.json(rows);
+
+    const orderWithStatus = rows.map(order => ({
+      ...order,
+      status: order.status || (order.concluido ? 'concluido' : 'pendente')
+    }));
+    return res.json(orderWithStatus);
   } catch (err) {
     console.error('Erro ao listar todos os pedidos: ', err);
     return res.status(500).json({ error: err.message });
@@ -56,9 +63,9 @@ orderRouter.post('/', async (req, res) => {
   try {
     const [result] = await pool.execute(
       `INSERT INTO orders
-         (remetente, destinatario, prazo_entrega, urgencia, detalhes, user_id)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [remetente, destinatario, prazoEntrega, urgencia, detalhes, userId]
+         (remetente, destinatario, prazo_entrega, urgencia, detalhes, user_id, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [remetente, destinatario, prazoEntrega, urgencia, detalhes, userId, 'pendente']
     );
     return res.status(201).json({ id: result.insertId });
   } catch (err) {
@@ -81,13 +88,19 @@ orderRouter.get('/user/:userId', async (req, res) => {
          detalhes,
          imagem,
          concluido,
+         status,
+         issue_reason AS issueReason,
          created_at AS criadoEm
        FROM orders
        WHERE user_id = ?
        ORDER BY criadoEm DESC`,
       [userId]
     );
-    return res.json(rows);
+    const orderWithStatus = rows.map(order => ({
+      ...order,
+      status: order.status || (order.concluido ? 'concluido' : 'pendente')
+    }));
+    return res.json(orderWithStatus);
   } catch (err) {
     console.error(`Erro ao listar pedidos do usuário ${userId}:`, err);
     return res.status(500).json({ error: err.message });
@@ -108,6 +121,8 @@ orderRouter.get('/:orderId', async (req, res) => {
          detalhes,
          imagem,
          concluido,
+         status,
+         issue_reason    AS issueReason,
          created_at      AS criadoEm,
          user_id         AS userId
        FROM orders
@@ -117,7 +132,8 @@ orderRouter.get('/:orderId', async (req, res) => {
     if (rows.length === 0) {
       return res.status(404).json({ error: 'Pedido não encontrado.' });
     }
-    return res.json(rows[0]);
+    const order = rows[0];
+    return res.json(order);
   } catch (err) {
     console.error(`Erro ao buscar pedido ${orderId}:`, err);
     return res.status(500).json({ error: err.message });
@@ -146,13 +162,40 @@ orderRouter.post('/:orderId/image', upload.single('image'), async (req, res) => 
 orderRouter.patch('/:orderId/complete', async (req, res) => {
   const { orderId } = req.params;
   try {
-    await pool.execute(
-      'UPDATE orders SET concluido = TRUE WHERE id = ?',
-      [orderId]
+    const [result] = await pool.execute(
+      'UPDATE orders SET status = ?, concluido = TRUE WHERE id = ?', 
+      ['concluido', orderId]
     );
-    return res.json({ message: 'Pedido marcado como concluído.' });
+    if (result.affectedRows === 0) {
+        return res.status(404).json({ error: 'Pedido não encontrado.' });
+    }
+    return res.json({ message: 'Pedido marcado como concluído.', status: 'concluido' });
   } catch (err) {
     console.error('Erro ao concluir pedido:', err);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// *** NOVA ROTA: Sinalizar Pedido com Problema ***
+orderRouter.patch('/:orderId/flag-issue', async (req, res) => {
+  const { orderId } = req.params;
+  const { issueReason } = req.body;
+
+  if (!issueReason) {
+      return res.status(400).json({ error: 'O motivo do problema é obrigatório.' });
+  }
+
+  try {
+    const [result] = await pool.execute(
+      'UPDATE orders SET status = ?, issue_reason = ?, concluido = FALSE WHERE id = ?', // Define concluido como FALSE
+      ['issue', issueReason, orderId]
+    );
+    if (result.affectedRows === 0) {
+        return res.status(404).json({ error: 'Pedido não encontrado.' });
+    }
+    return res.json({ message: 'Pedido sinalizado com problema.', status: 'issue' });
+  } catch (err) {
+    console.error(`Erro ao sinalizar pedido ${orderId} com problema:`, err);
     return res.status(500).json({ error: err.message });
   }
 });

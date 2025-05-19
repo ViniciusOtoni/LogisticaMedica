@@ -34,6 +34,8 @@ const createTables = async () => {
         detalhes TEXT,
         imagem VARCHAR(255),               
         concluido BOOLEAN NOT NULL DEFAULT FALSE,
+        status VARCHAR(50) NOT NULL DEFAULT 'pendente',
+        issue_reason TEXT,
         user_id INT NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE

@@ -1,4 +1,4 @@
-const API_URL = 'http://192.168.0.54:3000/api/orders';
+const API_URL = "http://192.168.5.66:3000/api/orders"; // http://192.168.0.54:3000
 
 /**
  * Cria um novo pedido.
@@ -6,11 +6,11 @@ const API_URL = 'http://192.168.0.54:3000/api/orders';
  * @returns {Promise<{ success: boolean, data?: { id: number }, message?: string }>}
  */
 export async function createOrder(orderPayload) {
-  console.log('createOrder payload:', orderPayload);
+  console.log("createOrder payload:", orderPayload);
   try {
     const response = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(orderPayload),
     });
 
@@ -19,17 +19,49 @@ export async function createOrder(orderPayload) {
     try {
       data = JSON.parse(text);
     } catch {
-      return { success: false, message: `Resposta inesperada do servidor: ${text}` };
+      return {
+        success: false,
+        message: `Resposta inesperada do servidor: ${text}`,
+      };
     }
 
     if (!response.ok) {
-      return { success: false, message: data.error || 'Erro ao criar pedido' };
+      return { success: false, message: data.error || "Erro ao criar pedido" };
     }
 
     return { success: true, data };
   } catch (error) {
-    console.error('createOrder exception:', error);
-    return { success: false, message: error.message || 'Erro de conexão com o servidor' };
+    console.error("createOrder exception:", error);
+    return {
+      success: false,
+      message: error.message || "Erro de conexão com o servidor",
+    };
+  }
+}
+
+/**
+ * Lista todos os pedidos (admin).
+ * @returns {Promise<Array<Object>>}
+ */
+export async function getAllOrders() {
+  try {
+    const response = await fetch(API_URL, {
+      headers: { Accept: "application/json" },
+    });
+    const text = await response.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      throw new Error(`Resposta inesperada ao buscar todos os pedids: ${text}`)
+    }
+    if (!response.ok) {
+      throw new Error(data.error || 'Erro ao buscar todos os pedidos')
+    }
+    return data;
+  } catch (err) {
+    console.error("getAllOrders exception: ", err);
+    throw err;
   }
 }
 
@@ -42,7 +74,7 @@ export async function getOrdersByUser(userId) {
   const url = `${API_URL}/user/${userId}`;
   try {
     const response = await fetch(url, {
-      headers: { 'Accept': 'application/json' },
+      headers: { Accept: "application/json" },
     });
     const text = await response.text();
     let data;
@@ -52,11 +84,11 @@ export async function getOrdersByUser(userId) {
       throw new Error(`Resposta inesperada ao buscar pedidos: ${text}`);
     }
     if (!response.ok) {
-      throw new Error(data.error || 'Falha ao buscar pedidos');
+      throw new Error(data.error || "Falha ao buscar pedidos");
     }
     return data;
   } catch (err) {
-    console.error('getOrdersByUser exception:', err);
+    console.error("getOrdersByUser exception:", err);
     throw err;
   }
 }
@@ -71,23 +103,29 @@ export async function getOrderById(orderId) {
   console.log(`Fetching order by ID: ${url}`);
   try {
     const response = await fetch(url, {
-      headers: { 'Accept': 'application/json' },
+      headers: { Accept: "application/json" },
     });
     const text = await response.text();
     let data;
     try {
       data = JSON.parse(text);
     } catch {
-      console.error('getOrderById parse error, response:', text);
-      return { success: false, message: `Resposta inesperada do servidor: ${text}` };
+      console.error("getOrderById parse error, response:", text);
+      return {
+        success: false,
+        message: `Resposta inesperada do servidor: ${text}`,
+      };
     }
     if (!response.ok) {
-      return { success: false, message: data.error || 'Erro ao buscar pedido' };
+      return { success: false, message: data.error || "Erro ao buscar pedido" };
     }
     return { success: true, data };
   } catch (err) {
-    console.error('getOrderById exception:', err);
-    return { success: false, message: err.message || 'Erro de conexão ao buscar pedido' };
+    console.error("getOrderById exception:", err);
+    return {
+      success: false,
+      message: err.message || "Erro de conexão ao buscar pedido",
+    };
   }
 }
 
@@ -100,16 +138,16 @@ export async function getOrderById(orderId) {
 export async function uploadOrderImage(orderId, imageUri) {
   const url = `${API_URL}/${orderId}/image`;
   const formData = new FormData();
-  formData.append('image', {
+  formData.append("image", {
     uri: imageUri,
     name: `pedido_${orderId}.jpg`,
-    type: 'image/jpeg',
+    type: "image/jpeg",
   });
 
   try {
     const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'multipart/form-data' },
+      method: "POST",
+      headers: { "Content-Type": "multipart/form-data" },
       body: formData,
     });
 
@@ -118,41 +156,96 @@ export async function uploadOrderImage(orderId, imageUri) {
     try {
       data = JSON.parse(text);
     } catch {
-      return { success: false, message: `Resposta inesperada ao enviar imagem: ${text}` };
+      return {
+        success: false,
+        message: `Resposta inesperada ao enviar imagem: ${text}`,
+      };
     }
     if (!response.ok) {
-      return { success: false, message: data.error || 'Erro ao enviar imagem' };
+      return { success: false, message: data.error || "Erro ao enviar imagem" };
     }
     return { success: true, imagem: data.imagem };
   } catch (err) {
-    console.error('uploadOrderImage exception:', err);
-    return { success: false, message: err.message || 'Erro de conexão ao enviar imagem' };
+    console.error("uploadOrderImage exception:", err);
+    return {
+      success: false,
+      message: err.message || "Erro de conexão ao enviar imagem",
+    };
   }
 }
 
 /**
  * Marca um pedido como concluído.
  * @param {number|string} orderId
- * @returns {Promise<{ success: boolean, message?: string }>}
+ * @returns {Promise<{ success: boolean, message?: string, status?: string }>}
  */
 export async function completeOrder(orderId) {
   const url = `${API_URL}/${orderId}/complete`;
   try {
-    const response = await fetch(url, { method: 'PATCH' });
+    const response = await fetch(url, { method: "PATCH" });
     const text = await response.text();
     let data;
     try {
       data = JSON.parse(text);
     } catch {
-      return { success: false, message: `Resposta inesperada ao concluir pedido: ${text}` };
+      return {
+        success: false,
+        message: `Resposta inesperada ao concluir pedido: ${text}`,
+      };
     }
     if (!response.ok) {
-      return { success: false, message: data.error || 'Erro ao concluir pedido' };
+      return {
+        success: false,
+        message: data.error || "Erro ao concluir pedido",
+      };
     }
-    return { success: true, message: data.message };
+    return { success: true, message: data.message, status: data.status };
   } catch (err) {
-    console.error('completeOrder exception:', err);
-    return { success: false, message: err.message || 'Erro de conexão ao concluir pedido' };
+    console.error("completeOrder exception:", err);
+    return {
+      success: false,
+      message: err.message || "Erro de conexão ao concluir pedido",
+    };
+  }
+}
+
+/**
+ * Sinaliza um pedido com problema.
+ * @param {number|string} orderId
+ * @param {string} issueReason
+ * @returns {Promise<{ success: boolean, message?: string, status?: string }>}
+ */
+export async function flagOrderIssue(orderId, issueReason) {
+  const url = `${API_URL}/${orderId}/flag-issue`;
+  try {
+    const response = await fetch(url, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ issueReason }),
+    });
+    const text = await response.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      return {
+        success: false,
+        message: `Resposta inesperada ao sinalizar problema: ${text}`,
+      };
+    }
+    if (!response.ok) {
+      return {
+        success: false,
+        message: data.error || "Erro ao sinalizar problema",
+      };
+    }
+    return { success: true, message: data.message, status: data.status };
+  } catch (err) {
+    console.error("flagOrderIssue exception:", err);
+    return {
+      success: false,
+      message: err.message || "Erro de conexão ao sinalizar problema",
+    };
   }
 }
 
@@ -166,8 +259,8 @@ export async function updateOrder(orderId, orderPayload) {
   const url = `${API_URL}/${orderId}`;
   try {
     const response = await fetch(url, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(orderPayload),
     });
 
@@ -176,17 +269,25 @@ export async function updateOrder(orderId, orderPayload) {
     try {
       data = JSON.parse(text);
     } catch {
-      return { success: false, message: `Resposta inesperada do servidor: ${text}` };
+      return {
+        success: false,
+        message: `Resposta inesperada do servidor: ${text}`,
+      };
     }
 
     if (!response.ok) {
-      return { success: false, message: data.error || 'Erro ao atualizar pedido' };
+      return {
+        success: false,
+        message: data.error || "Erro ao atualizar pedido",
+      };
     }
 
     return { success: true, message: data.message };
   } catch (err) {
-    console.error('updateOrder exception:', err);
-    return { success: false, message: err.message || 'Erro de conexão ao servidor' };
+    console.error("updateOrder exception:", err);
+    return {
+      success: false,
+      message: err.message || "Erro de conexão ao servidor",
+    };
   }
 }
-  
